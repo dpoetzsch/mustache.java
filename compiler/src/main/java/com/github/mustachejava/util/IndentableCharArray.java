@@ -9,7 +9,7 @@ public class IndentableCharArray {
     char[][] lines;
 
     public IndentableCharArray(String s) {
-        String[] ls = s.split("\n");
+        String[] ls = s.split("\n", -1);
         lines = new char[ls.length][];
 
         for (int i = 0; i < ls.length; ++i) {
