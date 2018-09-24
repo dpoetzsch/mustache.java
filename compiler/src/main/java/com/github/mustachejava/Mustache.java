@@ -34,15 +34,23 @@ public interface Mustache extends Code {
    * @param scope the root object to use
    * @return the new writer
    */
-  default Writer execute(Writer writer, Object scope) {
+  default Writer execute(Writer writer, char[] indent, Object scope) {
     return execute(writer, makeList(scope));
   }
 
+  default Writer execute(Writer writer, Object scope) {
+    return execute(writer, new char[0], scope);
+  }
+
   // Support the previous behavior for users
-  default Writer execute(Writer writer, Object[] scopes) {
+  default Writer execute(Writer writer, char[] indent, Object[] scopes) {
     List<Object> newscopes = new InternalArrayList<>();
     addAll(newscopes, scopes);
     return execute(writer, newscopes);
+  }
+
+  default Writer execute(Writer writer, Object[] scopes) {
+    return execute(writer, new char[0], scopes);
   }
 
   /**
@@ -53,7 +61,11 @@ public interface Mustache extends Code {
    * @param scopes an ordered list of scopes for variable resolution
    * @return the new writer
    */
-  Writer execute(Writer writer, List<Object> scopes);
+  Writer execute(Writer writer, char[] indent, List<Object> scopes);
+
+  default Writer execute(Writer writer, List<Object> scopes) {
+    return execute(writer, new char[0], scopes);
+  }
 
   /**
    * Get the underlying code objects.
@@ -89,7 +101,7 @@ public interface Mustache extends Code {
    * @param scopes the array of scopes to execute
    * @return the replacement writer
    */
-  Writer run(Writer writer, List<Object> scopes);
+  Writer run(Writer writer, char[] indent, List<Object> scopes);
 
   /**
    * Invert this mustache given output text.

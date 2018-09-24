@@ -503,23 +503,23 @@ public class InterpreterTest extends TestCase {
     DefaultMustacheFactory c = createMustacheFactory();
     c.setObjectHandler(new ReflectionObjectHandler() {
       @Override
-      public Writer falsey(Iteration iteration, Writer writer, Object object, List<Object> scopes) {
+      public Writer falsey(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes) {
         if (object instanceof Number) {
           if (((Number) object).intValue() == 0) {
-            return iteration.next(writer, object, scopes);
+            return iteration.next(writer, indent, object, scopes);
           }
         }
-        return super.falsey(iteration, writer, object, scopes);
+        return super.falsey(iteration, writer, indent, object, scopes);
       }
 
       @Override
-      public Writer iterate(Iteration iteration, Writer writer, Object object, List<Object> scopes) {
+      public Writer iterate(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes) {
         if (object instanceof Number) {
           if (((Number) object).intValue() == 0) {
             return writer;
           }
         }
-        return super.iterate(iteration, writer, object, scopes);
+        return super.iterate(iteration, writer, indent, object, scopes);
       }
     });
     StringWriter sw = new StringWriter();
@@ -703,13 +703,13 @@ public class InterpreterTest extends TestCase {
                 ConcurrentMap<String, Mustache> dynamicaPartialCache = new ConcurrentHashMap<>();
 
                 @Override
-                public Writer execute(Writer writer, List<Object> scopes) {
+                public Writer execute(Writer writer, char[] indent, List<Object> scopes) {
                   // Calculate the name of the dynamic partial
                   StringWriter sw = new StringWriter();
                   partial.execute(sw, scopes);
                   Mustache mustache = dynamicaPartialCache.computeIfAbsent(sw.toString(), df::compilePartial);
-                  Writer execute = mustache.execute(writer, scopes);
-                  return appendText(execute);
+                  Writer execute = mustache.execute(writer, indent, scopes);
+                  return appendText(execute, indent);
                 }
               });
             } else {
@@ -1401,14 +1401,14 @@ public class InterpreterTest extends TestCase {
           public void value(TemplateContext tc, String variable, boolean encoded) {
             list.add(new ValueCode(tc, df, variable, encoded) {
               @Override
-              public Writer execute(Writer writer, List<Object> scopes) {
+              public Writer execute(Writer writer, char[] indent, List<Object> scopes) {
                 try {
                   final Object object = get(scopes);
                   if (object != null) {
                     if (object instanceof Function) {
                       handleFunction(writer, (Function) object, scopes);
                     } else if (object instanceof Callable) {
-                      return handleCallable(writer, (Callable) object, scopes);
+                      return handleCallable(writer, indent, (Callable) object, scopes);
                     } else {
                       String stringify = oh.stringify(object);
                       if (stringify.equals("")) {
@@ -1419,7 +1419,7 @@ public class InterpreterTest extends TestCase {
                   } else {
                     GuardedBinding.logWarning("Variable is null: ", variable, scopes, tc);
                   }
-                  return appendText(run(writer, scopes));
+                  return appendText(run(writer, indent, scopes), indent);
                 } catch (Exception e) {
                   throw new MustacheException("Failed to get value for " + name, e, tc);
                 }
@@ -1515,13 +1515,13 @@ public class InterpreterTest extends TestCase {
           public void value(TemplateContext tc, String variable, boolean encoded) {
             list.add(new ValueCode(tc, df, variable, encoded) {
               @Override
-              public Writer execute(Writer writer, List<Object> scopes) {
+              public Writer execute(Writer writer, char[] indent, List<Object> scopes) {
                 try {
                   final Object object = get(scopes);
                   if (object == null) {
                     identity(writer);
                   }
-                  return super.execute(writer, scopes);
+                  return super.execute(writer, indent, scopes);
                 } catch (Exception e) {
                   throw new MustacheException("Failed to get value for " + name, e, tc);
                 }

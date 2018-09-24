@@ -18,29 +18,29 @@ public class NotIterableCode extends IterableCode {
   }
 
   @Override
-  public Writer execute(Writer writer, final List<Object> scopes) {
+  public Writer execute(Writer writer, char[] indent, final List<Object> scopes) {
     Object resolved = get(scopes);
-    writer = handle(writer, resolved, scopes);
-    appendText(writer);
+    writer = handle(writer, indent, resolved, scopes);
+    appendText(writer, indent);
     return writer;
   }
 
-  protected Writer handle(Writer writer, Object resolved, List<Object> scopes) {
+  protected Writer handle(Writer writer, char[] indent, Object resolved, List<Object> scopes) {
     if (resolved instanceof Callable) {
-      writer = handleCallable(writer, (Callable) resolved, scopes);
+      writer = handleCallable(writer, indent, (Callable) resolved, scopes);
     } else {
-      writer = execute(writer, resolved, scopes);
+      writer = execute(writer, indent, resolved, scopes);
     }
     return writer;
   }
 
   @Override
-  protected Writer execute(Writer writer, Object resolve, List<Object> scopes) {
-    return oh.falsey(this, writer, resolve, scopes);
+  protected Writer execute(Writer writer, char[] indent, Object resolve, List<Object> scopes) {
+    return oh.falsey(this, writer, indent, resolve, scopes);
   }
 
   @Override
-  public Writer next(Writer writer, Object object, List<Object> scopes) {
-    return run(writer, scopes);
+  public Writer next(Writer writer, char[] indent, Object object, List<Object> scopes) {
+    return run(writer, indent, scopes);
   }
 }

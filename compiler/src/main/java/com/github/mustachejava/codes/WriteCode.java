@@ -20,7 +20,7 @@ public class WriteCode extends DefaultCode {
 
   @Override
   public void identity(Writer writer) {
-    execute(writer, null);
+    execute(writer, EMPTY_INDENT, null);
   }
 
   private Pattern compiledAppended;

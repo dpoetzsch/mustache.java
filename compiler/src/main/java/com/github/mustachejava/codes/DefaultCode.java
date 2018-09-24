@@ -7,6 +7,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheException;
 import com.github.mustachejava.ObjectHandler;
 import com.github.mustachejava.TemplateContext;
+import com.github.mustachejava.util.IndentableCharArray;
 import com.github.mustachejava.util.Node;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Simplest possible code implementaion with some default shared behavior
  */
 public class DefaultCode implements Code, Cloneable {
+  protected static final char[] EMPTY_INDENT = new char[0];
+
   // Final once init() is complete
   protected String appended;
 
@@ -158,8 +161,8 @@ public class DefaultCode implements Code, Cloneable {
    * @param scopes The scopes to evaluate the embedded names against.
    */
   @Override
-  public Writer execute(Writer writer, List<Object> scopes) {
-    return appendText(run(writer, scopes));
+  public Writer execute(Writer writer, char[] indent, List<Object> scopes) {
+    return appendText(run(writer, indent, scopes), indent);
   }
 
   @Override
@@ -172,7 +175,7 @@ public class DefaultCode implements Code, Cloneable {
           tag(writer, "/");
         }
       }
-      appendText(writer);
+      appendText(writer, EMPTY_INDENT);
     } catch (IOException e) {
       throw new MustacheException("Failed to write", e, tc);
     }
@@ -192,16 +195,16 @@ public class DefaultCode implements Code, Cloneable {
     writer.write(tc.endChars());
   }
 
-  private char[] appendedChars;
+  private IndentableCharArray appendedChars;
   
-  protected Writer appendText(Writer writer) {
+  protected Writer appendText(Writer writer, char[] indent) {
     if (appended != null) {
       try {
         // Avoid allocations at runtime
         if (appendedChars == null) {
-          appendedChars = appended.toCharArray();
+          appendedChars = new IndentableCharArray(appended);
         }
-        writer.write(appendedChars);
+        appendedChars.appendText(writer, indent);
       } catch (IOException e) {
         throw new MustacheException("Failed to write", e, tc);
       }
@@ -209,8 +212,8 @@ public class DefaultCode implements Code, Cloneable {
     return writer;
   }
 
-  protected Writer run(Writer writer, List<Object> scopes) {
-    return mustache == null ? writer : mustache.run(writer, scopes);
+  protected Writer run(Writer writer, char[] indent, List<Object> scopes) {
+    return mustache == null ? writer : mustache.run(writer, indent, scopes);
   }
 
   @Override

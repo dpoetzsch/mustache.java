@@ -77,7 +77,7 @@ public class DeferringMustacheFactory extends DefaultMustacheFactory {
           Wrapper deferredWrapper;
 
           @Override
-          public Writer execute(Writer writer, final List<Object> scopes) {
+          public Writer execute(Writer writer, char[] indent, final List<Object> scopes) {
 
             final Object object = get(scopes);
             final DeferredCallable deferredCallable = getDeferred(scopes);
@@ -102,7 +102,7 @@ public class DeferringMustacheFactory extends DefaultMustacheFactory {
                       })));
               return writer;
             } else {
-              return appendText(partial.execute(writer, scopes));
+              return appendText(partial.execute(writer, indent, scopes), indent);
             }
           }
 

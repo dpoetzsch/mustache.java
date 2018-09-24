@@ -31,7 +31,7 @@ public abstract class BaseObjectHandler implements ObjectHandler {
   }
 
   @Override
-  public Writer falsey(Iteration iteration, Writer writer, Object object, List<Object> scopes) {
+  public Writer falsey(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes) {
     if (object != null) {
       if (object instanceof Boolean) {
         if ((Boolean) object) {
@@ -59,14 +59,14 @@ public abstract class BaseObjectHandler implements ObjectHandler {
         return writer;
       }
     }
-    return iteration.next(writer, object, scopes);
+    return iteration.next(writer, indent, object, scopes);
   }
 
   @Override
   public abstract Binding createBinding(String name, TemplateContext tc, Code code);
 
   @SuppressWarnings("ForLoopReplaceableByForEach") // it allocates objects for foreach
-  public Writer iterate(Iteration iteration, Writer writer, Object object, List<Object> scopes) {
+  public Writer iterate(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes) {
     if (object == null) return writer;
     if (object instanceof Boolean) {
       if (!(Boolean) object) {
@@ -82,24 +82,24 @@ public abstract class BaseObjectHandler implements ObjectHandler {
       List list = (List) object;
       int length = list.size();
       for (int i = 0; i < length; i++) {
-        writer = iteration.next(writer, coerce(list.get(i)), scopes);
+        writer = iteration.next(writer, indent, coerce(list.get(i)), scopes);
       }
     } else if (object instanceof Iterable) {
       for (Object next : ((Iterable) object)) {
-        writer = iteration.next(writer, coerce(next), scopes);
+        writer = iteration.next(writer, indent, coerce(next), scopes);
       }
     } else if (object instanceof Iterator) {
       Iterator iterator = (Iterator) object;
       while (iterator.hasNext()) {
-        writer = iteration.next(writer, coerce(iterator.next()), scopes);
+        writer = iteration.next(writer, indent, coerce(iterator.next()), scopes);
       }
     } else if (object.getClass().isArray()) {
       int length = Array.getLength(object);
       for (int i = 0; i < length; i++) {
-        writer = iteration.next(writer, coerce(Array.get(object, i)), scopes);
+        writer = iteration.next(writer, indent, coerce(Array.get(object, i)), scopes);
       }
     } else {
-      writer = iteration.next(writer, object, scopes);
+      writer = iteration.next(writer, indent, object, scopes);
     }
     return writer;
   }

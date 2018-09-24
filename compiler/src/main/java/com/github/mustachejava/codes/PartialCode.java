@@ -35,7 +35,7 @@ public class PartialCode extends DefaultCode {
       if (name != null) {
         super.tag(writer, type);
       }
-      appendText(writer);
+      appendText(writer, EMPTY_INDENT);
     } catch (IOException e) {
       throw new MustacheException(e, tc);
     }
@@ -52,7 +52,7 @@ public class PartialCode extends DefaultCode {
   }
 
   @Override
-  public Writer execute(Writer writer, final List<Object> scopes) {
+  public Writer execute(Writer writer, char[] indent, final List<Object> scopes) {
     DepthLimitedWriter depthLimitedWriter = null;
     // If the mustache wasn't found to recurse at compilation time we
     // don't need to track the recursion depth and therefore don't need
@@ -68,16 +68,17 @@ public class PartialCode extends DefaultCode {
       }
       writer = depthLimitedWriter;
     }
-    Writer execute = executePartial(writer, scopes);
+    Writer execute = executePartial(writer, indent, scopes);
     if (isRecursive) {
       assert depthLimitedWriter != null;
       depthLimitedWriter.decr();
     }
-    return appendText(execute);
+    return appendText(execute, indent);
   }
 
-  protected Writer executePartial(Writer writer, final List<Object> scopes) {
-    return partial.execute(writer, scopes);
+  protected Writer executePartial(Writer writer, char[] indent, final List<Object> scopes) {
+    // the legacy implementation does not indent partials
+    return partial.execute(writer, EMPTY_INDENT, scopes);
   }
 
   @Override

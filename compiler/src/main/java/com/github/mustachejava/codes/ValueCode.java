@@ -44,7 +44,7 @@ public class ValueCode extends DefaultCode {
         }
         writer.write(tc.endChars());
       }
-      appendText(writer);
+      appendText(writer, EMPTY_INDENT);
     } catch (IOException e) {
       throw new MustacheException(e, tc);
     }
@@ -57,29 +57,29 @@ public class ValueCode extends DefaultCode {
   }
 
   @Override
-  public Writer execute(Writer writer, final List<Object> scopes) {
+  public Writer execute(Writer writer, char[] indent, final List<Object> scopes) {
     try {
       final Object object = get(scopes);
       if (object != null) {
         if (object instanceof Function) {
           handleFunction(writer, (Function) object, scopes);
         } else if (object instanceof Callable) {
-          return handleCallable(writer, (Callable) object, scopes);
+          return handleCallable(writer, indent, (Callable) object, scopes);
         } else {
           execute(writer, oh.stringify(object));
         }
       }
-      return super.execute(writer, scopes);
+      return super.execute(writer, indent, scopes);
     } catch (Exception e) {
       throw new MustacheException("Failed to get value for " + name, e, tc);
     }
   }
 
-  protected Writer handleCallable(Writer writer, final Callable callable, final List<Object> scopes) throws Exception {
+  protected Writer handleCallable(Writer writer, char[] indent, final Callable callable, final List<Object> scopes) throws Exception {
     if (les == null) {
       Object call = callable.call();
       execute(writer, call == null ? null : oh.stringify(call));
-      return super.execute(writer, scopes);
+      return super.execute(writer, indent, scopes);
     } else {
       // Flush the current writer
       try {
@@ -98,7 +98,7 @@ public class ValueCode extends DefaultCode {
           latchedWriter.failed(e);
         }
       });
-      return super.execute(latchedWriter, scopes);
+      return super.execute(latchedWriter, indent, scopes);
     }
   }
 

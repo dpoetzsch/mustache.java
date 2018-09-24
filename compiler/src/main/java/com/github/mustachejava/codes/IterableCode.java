@@ -37,30 +37,30 @@ public class IterableCode extends DefaultCode implements Iteration {
   }
 
   @Override
-  public Writer execute(Writer writer, final List<Object> scopes) {
+  public Writer execute(Writer writer, char[] indent, final List<Object> scopes) {
     Object resolved = get(scopes);
-    writer = handle(writer, resolved, scopes);
-    appendText(writer);
+    writer = handle(writer, indent, resolved, scopes);
+    appendText(writer, indent);
     return writer;
   }
 
-  protected Writer handle(Writer writer, Object resolved, List<Object> scopes) {
+  protected Writer handle(Writer writer, char[] indent, Object resolved, List<Object> scopes) {
     if (resolved != null) {
       if (resolved instanceof Function) {
         writer = handleFunction(writer, (Function) resolved, scopes);
       } else if (resolved instanceof Callable) {
-        writer = handleCallable(writer, (Callable) resolved, scopes);
+        writer = handleCallable(writer, indent, (Callable) resolved, scopes);
       } else {
-        writer = execute(writer, resolved, scopes);
+        writer = execute(writer, indent, resolved, scopes);
       }
     }
     return writer;
   }
 
-  protected Writer handleCallable(Writer writer, final Callable callable, final List<Object> scopes) {
+  protected Writer handleCallable(Writer writer, char[] indent, final Callable callable, final List<Object> scopes) {
     if (les == null) {
       try {
-        writer = execute(writer, callable.call(), scopes);
+        writer = execute(writer, indent, callable.call(), scopes);
       } catch (Exception e) {
         throw new MustacheException(e, tc);
       }
@@ -80,7 +80,7 @@ public class IterableCode extends DefaultCode implements Iteration {
       les.execute(() -> {
         try {
           Object call = callable.call();
-          Writer subWriter = handle(originalWriter, call, newScopes);
+          Writer subWriter = handle(originalWriter, indent, call, newScopes);
           // Wait for the subwriter to complete
           if (subWriter instanceof LatchedWriter) {
             ((LatchedWriter) subWriter).await();
@@ -124,13 +124,13 @@ public class IterableCode extends DefaultCode implements Iteration {
     return df.getFragment(new FragmentKey(tc, templateText)).execute(writer, scopes);
   }
 
-  protected Writer execute(Writer writer, Object resolve, List<Object> scopes) {
-    return oh.iterate(this, writer, resolve, scopes);
+  protected Writer execute(Writer writer, char[] indent, Object resolve, List<Object> scopes) {
+    return oh.iterate(this, writer, indent, resolve, scopes);
   }
 
-  public Writer next(Writer writer, Object next, List<Object> scopes) {
+  public Writer next(Writer writer, char[] indent, Object next, List<Object> scopes) {
     boolean added = addScope(scopes, next);
-    writer = run(writer, scopes);
+    writer = run(writer, indent, scopes);
     if (added) scopes.remove(scopes.size() - 1);
     return writer;
   }

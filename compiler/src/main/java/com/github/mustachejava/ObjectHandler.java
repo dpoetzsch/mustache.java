@@ -37,7 +37,7 @@ public interface ObjectHandler {
    * @param scopes the scopes present
    * @return the current writer
    */
-  Writer iterate(Iteration iteration, Writer writer, Object object, List<Object> scopes);
+  Writer iterate(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes);
 
   /**
    * Call Iteration.next() either 0 (true) or 1 (fale) times.
@@ -48,7 +48,7 @@ public interface ObjectHandler {
    * @param scopes the scopes present
    * @return the current writer
    */
-  Writer falsey(Iteration iteration, Writer writer, Object object, List<Object> scopes);
+  Writer falsey(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes);
 
   /**
    * Each call site has its own binding to allow for fine grained caching without

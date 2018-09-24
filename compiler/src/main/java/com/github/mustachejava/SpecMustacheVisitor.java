@@ -29,12 +29,17 @@ public class SpecMustacheVisitor extends DefaultMustacheVisitor {
 
     public SpecPartialCode(TemplateContext tc, DefaultMustacheFactory cf, String variable, String indent) {
       super(tc, cf, variable);
+
       this.indent = indent;
     }
 
     @Override
-    protected Writer executePartial(Writer writer, final List<Object> scopes) {
-      partial.execute(new IndentWriter(writer, indent), scopes);
+    protected Writer executePartial(Writer writer, char[] indent, final List<Object> scopes) {
+      char[] i = new char[this.indent.length() + indent.length];
+      System.arraycopy(indent, 0, i, 0, indent.length);
+      this.indent.getChars(0, this.indent.length(), i, indent.length);
+
+      partial.execute(writer, i, scopes);
       return writer;
     }
   }

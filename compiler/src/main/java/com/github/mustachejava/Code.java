@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Code objects that are executed in order to evaluate the template
  */
 public interface Code {
-  Writer execute(Writer writer, List<Object> scopes);
+  Writer execute(Writer writer, char[] indent, List<Object> scopes);
 
   void identity(Writer writer);
 

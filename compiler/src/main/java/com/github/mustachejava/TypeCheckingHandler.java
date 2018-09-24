@@ -59,14 +59,14 @@ public class TypeCheckingHandler extends BaseObjectHandler {
   }
 
   @Override
-  public Writer falsey(Iteration iteration, Writer writer, Object object, List<Object> scopes) {
+  public Writer falsey(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes) {
     // Iterate once in either case
-    return iterate(iteration, writer, object, scopes);
+    return iterate(iteration, writer, indent, object, scopes);
   }
 
   @Override
-  public Writer iterate(Iteration iteration, Writer writer, Object object, List<Object> scopes) {
-    return iteration.next(writer, object, scopes);
+  public Writer iterate(Iteration iteration, Writer writer, char[] indent, Object object, List<Object> scopes) {
+    return iteration.next(writer, indent, object, scopes);
   }
 
   @Override

@@ -8,5 +8,5 @@ import java.util.List;
  * method in an ObjectHandler to change the types recognized by mustache.java as iterable.
  */
 public interface Iteration {
-  Writer next(Writer writer, Object next, List<Object> scopes);
+  Writer next(Writer writer, char[] indent, Object next, List<Object> scopes);
 }

@@ -28,10 +28,10 @@ public class DefaultMustache extends DefaultCode implements Mustache {
     return codes;
   }
 
-  public Writer run(Writer writer, List<Object> scopes) {
+  public Writer run(Writer writer, char[] indent, List<Object> scopes) {
     if (codes != null) {
       for (Code code : codes) {
-        writer = code.execute(writer, scopes);
+        writer = code.execute(writer, indent, scopes);
       }
     }
     return writer;
@@ -48,13 +48,13 @@ public class DefaultMustache extends DefaultCode implements Mustache {
   }
 
   @Override
-  public Writer execute(Writer writer, List<Object> scopes) {
+  public Writer execute(Writer writer, char[] indent, List<Object> scopes) {
     if (!(scopes instanceof InternalArrayList)) {
       // This is the only place where we explicitly allocate post initialization for a compiled mustache
       // in order to track the scopes as you descend the template. It ends up being ~200 bytes.
       scopes = new InternalArrayList<>(scopes);
     }
-    return super.execute(writer, scopes);
+    return super.execute(writer, indent, scopes);
   }
 
   @Override
