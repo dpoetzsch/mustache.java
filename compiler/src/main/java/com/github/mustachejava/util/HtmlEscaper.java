@@ -8,7 +8,7 @@ import java.io.Writer;
 /**
  * Escapes user data that you wish to include in HTML pages.
  */
-public class HtmlEscaper {
+public class HtmlEscaper implements Escaper {
 
   private static char[][] LT_96 = new char[97][];
 
@@ -54,7 +54,7 @@ public class HtmlEscaper {
     }
   }
 
-  public static void escape(String value, Writer writer) {
+  public void escape(String value, Writer writer) {
     try {
       int length = value.length();
       for (int i = 0; i < length; i++) {

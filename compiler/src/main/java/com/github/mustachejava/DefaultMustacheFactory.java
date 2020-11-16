@@ -3,6 +3,8 @@ package com.github.mustachejava;
 import com.github.mustachejava.codes.DefaultMustache;
 import com.github.mustachejava.reflect.ReflectionObjectHandler;
 import com.github.mustachejava.resolver.DefaultResolver;
+import com.github.mustachejava.util.Escaper;
+import com.github.mustachejava.util.HtmlEscaper;
 
 import java.io.File;
 import java.io.Reader;
@@ -14,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
-import static com.github.mustachejava.util.HtmlEscaper.escape;
 
 /**
  * Simplest possible code factory
@@ -49,6 +50,8 @@ public class DefaultMustacheFactory implements MustacheFactory {
   private final MustacheResolver mustacheResolver;
 
   protected ExecutorService es;
+
+  protected Escaper escaper = new HtmlEscaper();
 
   public DefaultMustacheFactory() {
     this.mustacheResolver = new DefaultResolver();
@@ -121,8 +124,22 @@ public class DefaultMustacheFactory implements MustacheFactory {
 
   @Override
   public void encode(String value, Writer writer) {
-    escape(value, writer);
+    escaper.escape(value, writer);
   }
+
+  /**
+   *  There is an Escaper, that is used to encode the values inserted with Handlebars
+   *
+   * @return the escaper service
+   */
+  public Escaper getEscaper(){return this.escaper; }
+
+  /**
+   *  You can override the default Escaper that is used to encode the inserted values.
+   *
+   * @param escaper The Escaper to use
+   */
+  public void setEscaper(Escaper escaper){ this.escaper = escaper; }
 
   @Override
   public ObjectHandler getObjectHandler() {
